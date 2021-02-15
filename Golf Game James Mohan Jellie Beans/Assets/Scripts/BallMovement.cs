@@ -11,6 +11,7 @@ public class BallMovement : MonoBehaviour
     private float shotForce;
     private Vector3 startPos, endPos, direction;
     private bool canShoot, shotStarted;
+    [SerializeField] private LineRenderer myLR;
 
     private void Start()
     {
@@ -25,18 +26,23 @@ public class BallMovement : MonoBehaviour
         {
             startPos = MousePositionInWorld();
             shotStarted = true;
+            myLR.gameObject.SetActive(true);
+            myLR.SetPosition(0, myLR.transform.localPosition);
         }
 
         if (Input.GetMouseButton(0) && shotStarted)
         {
             endPos = MousePositionInWorld();
             shotForce = Mathf.Clamp(Vector3.Distance(endPos, startPos), 0, maxForce);
+            myLR.SetPosition(1, transform.InverseTransformPoint(endPos));
         }
+        
 
         if (Input.GetMouseButtonUp(0) && shotStarted)
         {
             canShoot = false;
             shotStarted = false;
+            myLR.gameObject.SetActive(false);
         }
     }
 
