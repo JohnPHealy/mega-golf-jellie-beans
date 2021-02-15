@@ -5,32 +5,38 @@ using UnityEngine;
 
 public class BallMovement : MonoBehaviour
 {
-    [SerializeField]private float shotPower;
+    [SerializeField]private float shotPower, maxForce, minSpeed;
     
     private Rigidbody myRB;
+    private float shotForce;
     private Vector3 startPos, endPos, direction;
-    private bool canShoot = true;
+    private bool canShoot, shotStarted;
 
     private void Start()
     {
         myRB = GetComponent<Rigidbody>();
+        canShoot = true;
+        myRB.sleepThreshold = minSpeed;
     }
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && canShoot)
         {
             startPos = MousePositionInWorld();
+            shotStarted = true;
         }
 
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0) && shotStarted)
         {
             endPos = MousePositionInWorld();
+            shotForce = Mathf.Clamp(Vector3.Distance(endPos, startPos), 0, maxForce);
         }
 
-        if (Input.GetMouseButtonUp(0))
+        if (Input.GetMouseButtonUp(0) && shotStarted)
         {
             canShoot = false;
+            shotStarted = false;
         }
     }
 
@@ -39,8 +45,13 @@ public class BallMovement : MonoBehaviour
         if (!canShoot)
         {
             direction = startPos - endPos; 
-            myRB.AddForce(direction * shotPower, ForceMode.Impulse);
+            myRB.AddForce(Vector3.Normalize(direction) * shotForce * shotPower, ForceMode.Impulse);
             startPos = endPos = Vector3.zero;
+        }
+
+        if (myRB.IsSleeping())
+        {
+            canShoot = true;
         }
     }
 
