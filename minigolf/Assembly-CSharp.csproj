@@ -51,6 +51,9 @@
   </PropertyGroup>
   <ItemGroup>
      <Compile Include="Assets\Starfield Skybox\Demo\Script\LookCamera.cs" />
+     <Compile Include="Assets\CameraFollow.cs" />
+     <Compile Include="Assets\LoadLevelOnTrigger.cs" />
+     <Compile Include="Assets\BallMovement.cs" />
  <Reference Include="Unity.Timeline.Editor">
  <HintPath>C:/Users/kelme/Documents/GitHub/mega-golf-jellie-beans/minigolf/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
  </Reference>
