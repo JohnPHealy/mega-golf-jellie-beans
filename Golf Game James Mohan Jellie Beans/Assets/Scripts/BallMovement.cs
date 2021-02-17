@@ -2,16 +2,19 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class BallMovement : MonoBehaviour
 {
     [SerializeField]private float shotPower, maxForce, minSpeed;
+    [SerializeField] private LineRenderer myLR;
+    [SerializeField] private UnityEvent<string> shotTaken;
     
     private Rigidbody myRB;
     private float shotForce;
     private Vector3 startPos, endPos, direction;
     private bool canShoot, shotStarted;
-    [SerializeField] private LineRenderer myLR;
+    private int strokes;
 
     private void Start()
     {
@@ -43,6 +46,8 @@ public class BallMovement : MonoBehaviour
             canShoot = false;
             shotStarted = false;
             myLR.gameObject.SetActive(false);
+            strokes++;
+            shotTaken.Invoke(strokes.ToString());
         }
     }
 
