@@ -1,30 +1,32 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.Events;
 
-
-public class BallMovement: MonoBehaviour 
+public class BallMovement : MonoBehaviour
 {
     [SerializeField] private float shotPower, maxForce, minSpeed;
+    [SerializeField] private LineRenderer myLR;
+    [SerializeField] private UnityEvent<string> shotTaken;
 
     private Rigidbody myRB;
     private float shotForce;
     private Vector3 startPos, endPos, direction;
-    private bool canshoot, shotStarted;
-
-     [SerializeField]   private LineRenderer myLR;
+    private bool canShoot, shotStarted;
+    private int strokes;
+    
 
     private void Start()
     {
-        myRB = GetComponent<Rigidbody>(); ;
-        canshoot = true;
+        myRB = GetComponent<Rigidbody>();
+        canShoot = true;
         myRB.sleepThreshold = minSpeed;
     }
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0) && canshoot)
+        if (Input.GetMouseButtonDown(0) && canShoot)
         {
-            startPos = MousePositionInTheWorld();
+            startPos = MousePositionInWorld();
             shotStarted = true;
             myLR.gameObject.SetActive(true);
             myLR.SetPosition(0, myLR.transform.localPosition);
@@ -32,24 +34,24 @@ public class BallMovement: MonoBehaviour
 
         if (Input.GetMouseButton(0) && shotStarted)
         {
-            endPos = MousePositionInTheWorld();
+            endPos = MousePositionInWorld();
             shotForce = Mathf.Clamp(Vector3.Distance(endPos, startPos), 0, maxForce);
-            myLR.SetPosition(1,transform.InverseTransformPoint(endPos));
-
+            myLR.SetPosition(1, transform.InverseTransformPoint(endPos));
         }
 
         if (Input.GetMouseButtonUp(0) && shotStarted)
         {
-            canshoot = false;
+            canShoot = false;
             shotStarted = false;
             myLR.gameObject.SetActive(false);
+            strokes++;
+            shotTaken.Invoke(strokes.ToString());
         }
-
     }
 
     private void FixedUpdate()
     {
-        if (!canshoot)
+        if (!canShoot)
         {
             direction = startPos - endPos;
             myRB.AddForce(Vector3.Normalize(direction) * shotForce * shotPower, ForceMode.Impulse);
@@ -58,12 +60,11 @@ public class BallMovement: MonoBehaviour
 
         if (myRB.IsSleeping())
         {
-            canshoot = true;
+            canShoot = true;
         }
     }
 
-    private Vector3 MousePositionInTheWorld()
-
+    private Vector3 MousePositionInWorld()
     {
         Vector3 position = Vector3.zero;
         var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
